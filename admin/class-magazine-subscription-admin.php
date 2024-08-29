@@ -10,6 +10,7 @@
  * @subpackage Magazine_Subscription/admin
  */
 require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-menu.php';
+require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-helpers.php';
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -54,6 +55,7 @@ class Magazine_Subscription_Admin
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		new Magazine_Subscription_Menu();
+		new Magazine_Subscription_Helpers();
 	}
 
 	/**
