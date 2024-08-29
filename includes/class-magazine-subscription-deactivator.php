@@ -20,7 +20,8 @@
  * @subpackage Magazine_Subscription/includes
  * @author     MirT <tuszynski.mir@gmail.com>
  */
-class Magazine_Subscription_Deactivator {
+class Magazine_Subscription_Deactivator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,41 @@ class Magazine_Subscription_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
+	public static function deactivate()
+	{
+		if (self::should_delete_tables()) {
+			self::drop_table('magazine_subscribe_settings');
+			self::drop_table('magazine_subscribe_users');
+		}
+	}
+	/**
+	 * Check if the user wants to delete the tables.
+	 *
+	 * @since    1.0.0
+	 */
 
+	private static function should_delete_tables()
+	{
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'magazine_subscribe_settings';
+		$query = $wpdb->prepare("SELECT delete_tables_on_deactivation FROM $table_name WHERE id = %d", 1);
+		$result = $wpdb->get_var($query);
+		return (bool) $result;
 	}
 
+	/**
+	 * Drop a table from the database.
+	 *
+	 * @since    1.0.0
+	 */
+	private static function drop_table($table_suffix)
+	{
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . $table_suffix;
+
+		$sql = "DROP TABLE IF EXISTS $table_name;";
+
+		$wpdb->query($sql);
+	}
 }

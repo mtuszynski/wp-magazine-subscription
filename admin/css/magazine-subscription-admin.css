@@ -2,3 +2,22 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+.magazine-subscription-form .form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.magazine-subscription-form .form-group label {
+  width: 200px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.magazine-subscription-form .form-group .input-field {
+  flex: 1;
+}
+
+.magazine-subscription-form .form-group input[type="submit"] {
+  margin-top: 15px;
+}
