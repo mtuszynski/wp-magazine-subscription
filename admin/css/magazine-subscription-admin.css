@@ -21,3 +21,8 @@
 .magazine-subscription-form .form-group input[type="submit"] {
   margin-top: 15px;
 }
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

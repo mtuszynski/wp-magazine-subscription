@@ -4,6 +4,10 @@
  *
  * The Magazine_Subscription_Menu class represents the menu and its submenus for the Magazine Subscription plugin in the WordPress admin area.
  *
+ * @since      1.0.0
+ * @package    Magazine_Subscription
+ * @subpackage Magazine_Subscription/admin/partials
+ * @author     MirT <tuszynski.mir@gmail.com>
  */
 class Magazine_Subscription_Menu
 {

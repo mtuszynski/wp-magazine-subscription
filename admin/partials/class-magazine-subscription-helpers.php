@@ -10,8 +10,9 @@
  * required in the plugin's codebase.
  *
  * @package    Magazine_Subscription
- * @subpackage Magazine_Subscription/includes
+ * @subpackage Magazine_Subscription/admin/partials
  * @since      1.0.0
+ * @author     MirT <tuszynski.mir@gmail.com>
  */
 class Magazine_Subscription_Helpers
 {
@@ -63,5 +64,20 @@ class Magazine_Subscription_Helpers
         $products = get_posts($args);
 
         return $products;
+    }
+
+    /**
+     * Checks if a product belongs to a specified category.
+     *
+     * This method verifies whether a given product ID is associated with a specific product category ID.
+     *
+     * @param int $product_id The ID of the product to check.
+     * @param int $selected_category_id The ID of the category to check against.
+     * @return bool True if the product is in the specified category, false otherwise.
+     */
+    public static function products_in_subscribed_category($product_id, $selected_category_id)
+    {
+        $product_categories = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
+        return in_array($selected_category_id, $product_categories, true);
     }
 }
