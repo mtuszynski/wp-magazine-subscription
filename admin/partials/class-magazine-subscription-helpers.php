@@ -80,4 +80,25 @@ class Magazine_Subscription_Helpers
         $product_categories = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
         return in_array($selected_category_id, $product_categories, true);
     }
+
+    /**
+     * Retrieves the highest subscription_product_id from products in a given category, including variations.
+     *
+     * @param int $category_id ID of the product category.
+     * @return int The highest subscription_product_id.
+     */
+    public static function get_max_subscription_product_id($category_id)
+    {
+        $products = self::get_products_by_category($category_id);
+        $max_subscription_product_id = 0;
+
+        foreach ($products as $product) {
+            $subscription_product_id = get_post_meta($product->ID, 'subscription_product_id', true);
+            if ($subscription_product_id > $max_subscription_product_id) {
+                $max_subscription_product_id = $subscription_product_id;
+            }
+        }
+
+        return $max_subscription_product_id;
+    }
 }
