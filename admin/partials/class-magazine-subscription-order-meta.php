@@ -48,40 +48,45 @@ class Magazine_Subscription_Order_Meta
      */
     public function display_subscribe_order_data_in_admin($order)
     {
-        echo '<p class="form-field form-field-wide"><label for="subscription_start"><strong>' . __('Subscription Start', 'woocommerce') . ':</strong></label>
+        $order_id = $order->get_id();
+        if (Magazine_Subscription_Helpers::order_contains_subscription_product($order_id)) {
+            echo '<p class="form-field form-field-wide"><label for="subscription_start"><strong>' . __('Subscription Start', 'woocommerce') . ':</strong></label>
     <input type="text" name="subscription_start" id="subscription_start" value="' . esc_attr(get_post_meta($order->get_id(), 'subscription_start', true)) . '" /></p>';
 
-        echo '<p class="form-field form-field-wide"><label for="subscription_length"><strong>' . __('Subscription Length', 'woocommerce') . ':</strong></label>
+            echo '<p class="form-field form-field-wide"><label for="subscription_length"><strong>' . __('Subscription Length', 'woocommerce') . ':</strong></label>
     <input type="text" name="subscription_length" id="subscription_length" value="' . esc_attr(get_post_meta($order->get_id(), 'subscription_length', true)) . '" /></p>';
 
-        echo '<p class="form-field form-field-wide"><label for="subscription_end"><strong>' . __('Subscription End', 'woocommerce') . ':</strong></label>
+            echo '<p class="form-field form-field-wide"><label for="subscription_end"><strong>' . __('Subscription End', 'woocommerce') . ':</strong></label>
     <input type="text" name="subscription_end" id="subscription_end" value="' . esc_attr(get_post_meta($order->get_id(), 'subscription_end', true)) . '" /></p>';
 
-        echo '<p class="form-field form-field-wide"><label for="selected_attribute"><strong>' . __('Selected Attribute', 'woocommerce') . ':</strong></label>
+            echo '<p class="form-field form-field-wide"><label for="selected_attribute"><strong>' . __('Selected Attribute', 'woocommerce') . ':</strong></label>
     <input type="text" name="selected_attribute" id="selected_attribute" value="' . esc_attr(get_post_meta($order->get_id(), 'selected_attribute', true)) . '" /></p>';
 
-        echo '<p class="form-field form-field-wide"><label for="category_product"><strong>' . __('Category Product', 'woocommerce') . ':</strong></label>
+            echo '<p class="form-field form-field-wide"><label for="category_product"><strong>' . __('Category Product', 'woocommerce') . ':</strong></label>
     <input type="text" name="category_product" id="category_product" value="' . esc_attr(get_post_meta($order->get_id(), 'category_product', true)) . '" /></p>';
+        }
     }
 
     function save_subscription_order_data($order_id)
     {
-        if (isset($_POST['subscription_start'])) {
-            update_post_meta($order_id, 'subscription_start', sanitize_text_field($_POST['subscription_start']));
+        if (Magazine_Subscription_Helpers::order_contains_subscription_product($order_id)) {
+            if (isset($_POST['subscription_start'])) {
+                update_post_meta($order_id, 'subscription_start', sanitize_text_field($_POST['subscription_start']));
+            }
+            if (isset($_POST['subscription_length'])) {
+                update_post_meta($order_id, 'subscription_length', sanitize_text_field($_POST['subscription_length']));
+            }
+            if (isset($_POST['subscription_end'])) {
+                update_post_meta($order_id, 'subscription_end', sanitize_text_field($_POST['subscription_end']));
+            }
+            if (isset($_POST['selected_attribute'])) {
+                update_post_meta($order_id, 'selected_attribute', sanitize_text_field($_POST['selected_attribute']));
+            }
+            if (isset($_POST['category_product'])) {
+                update_post_meta($order_id, 'category_product', sanitize_text_field($_POST['category_product']));
+            }
+            $this->update_subscription_in_database($order_id);
         }
-        if (isset($_POST['subscription_length'])) {
-            update_post_meta($order_id, 'subscription_length', sanitize_text_field($_POST['subscription_length']));
-        }
-        if (isset($_POST['subscription_end'])) {
-            update_post_meta($order_id, 'subscription_end', sanitize_text_field($_POST['subscription_end']));
-        }
-        if (isset($_POST['selected_attribute'])) {
-            update_post_meta($order_id, 'selected_attribute', sanitize_text_field($_POST['selected_attribute']));
-        }
-        if (isset($_POST['category_product'])) {
-            update_post_meta($order_id, 'category_product', sanitize_text_field($_POST['category_product']));
-        }
-        $this->update_subscription_in_database($order_id);
     }
 
     /**
