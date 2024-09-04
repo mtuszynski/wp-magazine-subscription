@@ -101,4 +101,31 @@ class Magazine_Subscription_Helpers
 
         return $max_subscription_product_id;
     }
+
+    /**
+     * Checks if an order contains a product from a subscription category.
+     *
+     * This method examines all products in an order to determine if any belong to the subscription category.
+     *
+     * @param int $order_id The ID of the WooCommerce order.
+     * @return bool True if the order contains a product from the subscription category, false otherwise.
+     */
+    public static function order_contains_subscription_product($order_id)
+    {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return false;
+        }
+
+        foreach ($order->get_items() as $item_id => $item) {
+            $product_id = $item->get_product_id();
+            $selected_category_id = self::get_subscribe_category_id();
+
+            if (self::products_in_subscribed_category($product_id, $selected_category_id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
