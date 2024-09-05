@@ -152,8 +152,77 @@ class Magazine_Subscription_Menu
     }
 
 
-    function magazine_subscription_active_list_page() {}
+    function magazine_subscription_active_list_page()
+    {
+        echo '<h1>' . __('Active subscription', 'magazine-subscription') . '</h1>';
+        $this->display_active_subscriptions();
+    }
     function magazine_subscription_inactive_list_page() {}
     function magazine_subscription_send_page() {}
     function magazine_subscription_export_page() {}
+
+    /**
+     * Displays a table of active subscriptions in the WordPress admin area.
+     *
+     * This function retrieves active subscriptions from the custom database table and displays them in a table format.
+     * The table includes details such as username, email, order ID, product name, subscription start, subscription end,
+     * attribute selector, and the number of subscriptions left.
+     */
+    function display_active_subscriptions()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'psx_user_subscriptions';
+
+        // Prepare and execute the SQL query to fetch active subscriptions
+        $query = $wpdb->prepare(
+            "SELECT * FROM $table_name WHERE subscribe_left > %d",
+            0
+        );
+        $subscriptions = $wpdb->get_results($query);
+
+        echo '<div class="wrap">';
+        echo '<h1 class="wp-heading-inline">' . __('Active Subscriptions', 'magazine-subscription') . '</h1>';
+
+        if ($subscriptions) {
+            echo '<table id="MagazineSubscriptionsActive" class="wp-list-table widefat fixed striped">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th>' . __('Username', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Email', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Order ID', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Product Name', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Subscription Start', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Subscription End', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Attribute Selector', 'magazine-subscription') . '</th>';
+            echo '<th>' . __('Subscription Left', 'magazine-subscription') . '</th>';
+            echo '</tr>';
+            echo '</thead>';
+            echo '<tbody>';
+
+            foreach ($subscriptions as $subscription) {
+                $subscription_start = $subscription->subscription_start;
+                $subscription_end = $subscription->subscription_end;
+                $order_permalink = admin_url('post.php?post=' . $subscription->order_id . '&action=edit');
+
+                echo '<tr>';
+                echo '<td>' . esc_html($subscription->user_login) . '</td>';
+                echo '<td>' . esc_html($subscription->user_email) . '</td>';
+                echo '<td><a href="' . esc_url($order_permalink) . '">' . esc_html($subscription->order_id) . '</a></td>';
+                echo '<td>' . esc_html($subscription->product_name) . '</td>';
+                echo '<td>' . esc_html($subscription_start) . '</td>';
+                echo '<td>' . esc_html($subscription_end) . '</td>';
+                echo '<td>' . esc_html($subscription->attribute_selector) . '</td>';
+                echo '<td>' . esc_html($subscription->subscribe_left) . '</td>';
+                echo '</tr>';
+            }
+
+            echo '</tbody>';
+            echo '</table>';
+        } else {
+            echo '<p>' . __('No active subscriptions found.', 'magazine-subscription') . '</p>';
+        }
+
+        echo '</div>';
+    }
 }
