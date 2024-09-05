@@ -83,6 +83,7 @@ class Magazine_Subscription_Admin
 		 */
 
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/magazine-subscription-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style('dataTables', 'https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -106,5 +107,6 @@ class Magazine_Subscription_Admin
 		 */
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/magazine-subscription-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script('dataTables', 'https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js', array('jquery'), $this->version, true);
 	}
 }
