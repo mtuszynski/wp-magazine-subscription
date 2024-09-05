@@ -49,7 +49,7 @@ class Magazine_Subscription_Order_Meta
     public function display_subscribe_order_data_in_admin($order)
     {
         $order_id = $order->get_id();
-        if (Magazine_Subscription_Helpers::order_contains_subscription_product($order_id)) {
+        if (Magazine_Subscription_Helpers::get_subscription_product_from_order($order_id)) {
             echo '<p class="form-field form-field-wide"><label for="subscription_start"><strong>' . __('Subscription Start', 'woocommerce') . ':</strong></label>
     <input type="text" name="subscription_start" id="subscription_start" value="' . esc_attr(get_post_meta($order->get_id(), 'subscription_start', true)) . '" /></p>';
 
@@ -66,10 +66,16 @@ class Magazine_Subscription_Order_Meta
     <input type="text" name="category_product" id="category_product" value="' . esc_attr(get_post_meta($order->get_id(), 'category_product', true)) . '" /></p>';
         }
     }
-
+    /**
+     * Saves subscription data to the order post meta if the order contains a subscription product.
+     *
+     * This function updates various subscription-related meta fields for the order if a subscription product is present.
+     *
+     * @param int $order_id The ID of the WooCommerce order.
+     */
     function save_subscription_order_data($order_id)
     {
-        if (Magazine_Subscription_Helpers::order_contains_subscription_product($order_id)) {
+        if (Magazine_Subscription_Helpers::get_subscription_product_from_order($order_id)) {
             if (isset($_POST['subscription_start'])) {
                 update_post_meta($order_id, 'subscription_start', sanitize_text_field($_POST['subscription_start']));
             }

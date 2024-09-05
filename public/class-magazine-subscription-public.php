@@ -9,7 +9,7 @@
  * @package    Magazine_Subscription
  * @subpackage Magazine_Subscription/public
  */
-
+require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-checkout-meta.php';
 /**
  * The public-facing functionality of the plugin.
  *
@@ -20,7 +20,8 @@
  * @subpackage Magazine_Subscription/public
  * @author     MirT <tuszynski.mir@gmail.com>
  */
-class Magazine_Subscription_Public {
+class Magazine_Subscription_Public
+{
 
 	/**
 	 * The ID of this plugin.
@@ -47,11 +48,12 @@ class Magazine_Subscription_Public {
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+		new Magazine_Subscription_Checkout_Meta();
 	}
 
 	/**
@@ -59,7 +61,8 @@ class Magazine_Subscription_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -73,8 +76,7 @@ class Magazine_Subscription_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/magazine-subscription-public.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/magazine-subscription-public.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -82,7 +84,8 @@ class Magazine_Subscription_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -96,8 +99,6 @@ class Magazine_Subscription_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/magazine-subscription-public.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/magazine-subscription-public.js', array('jquery'), $this->version, false);
 	}
-
 }
