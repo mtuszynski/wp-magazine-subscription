@@ -159,7 +159,30 @@ class Magazine_Subscription_Menu
     }
     function magazine_subscription_inactive_list_page() {}
     function magazine_subscription_send_page() {}
-    function magazine_subscription_export_page() {}
+
+    /**
+     * Displays the export page for subscribers in the WordPress admin.
+     *
+     * This method generates a page with a button to export subscription data to a CSV file.
+     * If the 'export' query parameter is set to 'csv', it triggers the CSV export and exits.
+     */
+    function magazine_subscription_export_page()
+    {
+        echo '<h1>' . __('Export active subscribers to csv file', 'magazine-subscription') . '</h1>';
+        if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
+            $this->export_csv();
+            exit;
+        }
+
+        echo '<div class="wrap">';
+        echo '<h1>' . __('Subscribers Export', 'magazine-subscription') . '</h1>';
+        echo '<p><a href="' . admin_url('admin.php?page=magazine-subscription-export-page&export=csv') . '" class="button button-primary">' . __('Export Subscriptions to CSV', 'magazine-subscription') . '</a></p>';
+        echo '</div>';
+    }
 
     /**
      * Displays a table of active subscriptions in the WordPress admin area.
@@ -172,7 +195,7 @@ class Magazine_Subscription_Menu
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'psx_user_subscriptions';
+        $table_name = $wpdb->prefix . 'magazine_subscribe_users';
 
         // Prepare and execute the SQL query to fetch active subscriptions
         $query = $wpdb->prepare(
@@ -224,5 +247,62 @@ class Magazine_Subscription_Menu
         }
 
         echo '</div>';
+    }
+
+    /**
+     * Exports subscription data to a CSV file and initiates a download.
+     *
+     * This method fetches subscription data from the database and outputs it as a CSV file for download.
+     */
+    private function export_csv()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'magazine_subscribe_users';
+
+        $subscriptions = $wpdb->get_results(
+            $wpdb->prepare("SELECT * FROM $table_name WHERE subscribe_left > %d", 0)
+        );
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="active_subscriptions.csv"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: no-cache');
+
+        echo "\xEF\xBB\xBF";
+
+        $output = fopen('php://output', 'w');
+
+        $separator = ';';
+        fputcsv($output, array(
+            __('Username', 'magazine-subscription'),
+            __('Email', 'magazine-subscription'),
+            __('Order Id', 'magazine-subscription'),
+            __('Product Name', 'magazine-subscription'),
+            __('Subscription Start', 'magazine-subscription'),
+            __('Subscription End', 'magazine-subscription'),
+            __('Attribute Selector', 'magazine-subscription'),
+            __('Subscription Left', 'magazine-subscription')
+        ), $separator);
+
+        foreach ($subscriptions as $subscription) {
+            fputcsv($output, array(
+                $subscription->user_login,
+                $subscription->user_email,
+                $subscription->order_id,
+                $subscription->product_name,
+                $subscription->subscription_start,
+                $subscription->subscription_end,
+                $subscription->attribute_selector,
+                $subscription->subscribe_left
+            ), $separator);
+        }
+
+        fclose($output);
+
+        exit();
     }
 }
