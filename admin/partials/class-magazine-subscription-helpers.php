@@ -134,4 +134,149 @@ class Magazine_Subscription_Helpers
 
         return false;
     }
+    /**
+     * Get the attribute term ID and attribute name (taxonomy) based on the slug.
+     *
+     * @param string $attribute_slug The slug of the attribute term.
+     * @return array|false An array with 'term_id' and 'attribute_name' if found, false otherwise.
+     */
+    public static function get_attribute_term_id_and_name_by_slug($attribute_slug)
+    {
+        $attribute_taxonomies = wc_get_attribute_taxonomies();
+
+        if (!$attribute_taxonomies) {
+            return false;
+        }
+        foreach ($attribute_taxonomies as $tax) {
+            $taxonomy = wc_attribute_taxonomy_name($tax->attribute_name);
+
+            if (!taxonomy_exists($taxonomy)) {
+                continue;
+            }
+            $term = get_term_by('slug', $attribute_slug, $taxonomy);
+
+            if ($term && !is_wp_error($term)) {
+                return array(
+                    'term_id'        => $term->term_id,
+                    'attribute_name' => $tax->attribute_name
+                );
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves the variation ID based on the product and attribute term.
+     *
+     * @param int    $product_id         The product ID.
+     * @param string $attribute_name     The attribute taxonomy name.
+     * @param int    $attribute_term_id  The attribute term ID.
+     *
+     * @return int|false  The variation ID or false if not found.
+     */
+    public static function get_product_variation_id($product_id, $attribute_name, $attribute_term_id)
+    {
+        $product = wc_get_product($product_id);
+        $term = get_term_by('id', $attribute_term_id, 'pa_' . sanitize_title($attribute_name));
+
+        if (!$term) {
+            return false;
+        }
+
+        $attribute_value = $term->slug;
+
+        if ($product && $product->is_type('variable')) {
+            $available_variations = $product->get_available_variations();
+            foreach ($available_variations as $variation) {
+                $attribute_key = 'attribute_pa_' . sanitize_title($attribute_name);
+                if (isset($variation['attributes'][$attribute_key]) && $variation['attributes'][$attribute_key] == $attribute_value) {
+                    return $variation['variation_id'];
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds a product (either simple or variable) to an order and ensures download access is granted.
+     *
+     * @param int    $order_id           The order ID.
+     * @param int    $product_id         The product ID.
+     * @param string $attribute_name     The attribute taxonomy name.
+     * @param int    $attribute_value    The attribute term ID or value.
+     *
+     * @return void
+     */
+    public static function add_product_to_order($order_id, $product_id, $attribute_name, $attribute_value)
+    {
+        error_log($order_id . ' ' . $product_id . ' ' . $attribute_name . ' ' . $attribute_value);
+
+        // Get order and product objects
+        $order = wc_get_order($order_id);
+        $product = wc_get_product($product_id);
+
+        if (!$order || !$product) {
+            error_log('Order or product not found');
+            return;
+        }
+
+        // Handle variable products
+        if ($product->is_type('variable')) {
+            // Use the helper function to get the variation ID
+            $variation_id = self::get_product_variation_id($product_id, $attribute_name, $attribute_value);
+            if (!$variation_id) {
+                error_log('No variation found');
+                return;
+            }
+
+            // Check if the product variation is already in the order
+            foreach ($order->get_items() as $item) {
+                if ($item->get_variation_id() == $variation_id) {
+                    error_log('Product variation already in order');
+                    return;
+                }
+            }
+
+            // Add the variation to the order
+            $variation_product = wc_get_product($variation_id);
+            $variation_product->set_price(0); // Set price to 0
+            $order->add_product($variation_product, 1);
+            error_log('Product variation added to order');
+
+            // Recalculate order totals and update status
+            $order->calculate_totals();
+            $order->save();
+            $order->update_status('completed');
+
+            // Grant download permissions if applicable
+            $downloads = $variation_product->get_downloads();
+            foreach ($downloads as $download_id => $download) {
+                wc_downloadable_file_permission($download_id, $variation_product->get_id(), $order);
+            }
+        } else {
+            // Handle simple products
+            foreach ($order->get_items() as $item) {
+                if ($item->get_product_id() == $product_id) {
+                    error_log('Simple product already in order');
+                    return;
+                }
+            }
+
+            // Set price to 0 and add simple product to the order
+            $product->set_price(0);
+            $order->add_product($product, 1);
+            error_log('Simple product added to order');
+
+            // Recalculate order totals and update status
+            $order->calculate_totals();
+            $order->save();
+            $order->update_status('completed');
+
+            // Grant download permissions if applicable
+            $downloads = $product->get_downloads();
+            foreach ($downloads as $download_id => $download) {
+                wc_downloadable_file_permission($download_id, $product->get_id(), $order);
+            }
+        }
+    }
 }
