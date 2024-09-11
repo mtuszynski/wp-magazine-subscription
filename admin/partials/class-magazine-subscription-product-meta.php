@@ -42,6 +42,15 @@ class Magazine_Subscription_Product_Meta
         global $post;
         $product_id = $post->ID;
         $selected_category_id = Magazine_Subscription_Helpers::get_subscribe_category_id();
+        $products_from_cat = Magazine_Subscription_Helpers::get_category_products_meta($selected_category_id);
+
+        $is_in_subscribed_category = false;
+        foreach ($products_from_cat as $category_id) {
+            if (Magazine_Subscription_Helpers::products_in_subscribed_category($product_id, $category_id)) {
+                $is_in_subscribed_category = true;
+                break;
+            }
+        }
 
         if (Magazine_Subscription_Helpers::products_in_subscribed_category($product_id, $selected_category_id)) { ?>
             <div class="options_group">
@@ -121,7 +130,7 @@ class Magazine_Subscription_Product_Meta
                 </div>
             </div>
 <?php
-        } else if() {
+        } else if ($is_in_subscribed_category) {
             woocommerce_wp_text_input(
                 array(
                     'id'                => 'subscription_product_id',
