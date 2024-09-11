@@ -14,6 +14,7 @@ require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-h
 require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-product-meta.php';
 require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-order-meta.php';
 require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-order-complete.php';
+require_once plugin_dir_path(__FILE__) . 'partials/class-magazine-subscription-product-send.php';
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -62,6 +63,7 @@ class Magazine_Subscription_Admin
 		new Magazine_Subscription_Product_Meta();
 		new Magazine_Subscription_Order_Meta();
 		new Magazine_Subscription_Order_Complete();
+		new Magazine_Subscription_Product_Send();
 	}
 
 	/**
