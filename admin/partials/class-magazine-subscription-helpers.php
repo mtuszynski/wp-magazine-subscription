@@ -82,6 +82,32 @@ class Magazine_Subscription_Helpers
     }
 
     /**
+     * Retrieves the unique subscription category IDs from products within a specific category.
+     *
+     * This function loops through all products in a specified category and extracts the 
+     * 'category_product' meta field. It returns an array of unique category IDs, with values
+     * converted to integers.
+     *
+     * @param int $category_id The ID of the product category to retrieve products from.
+     *
+     * @return array An array of unique subscription category IDs (as integers).
+     */
+    public static function get_category_products_meta($category_id)
+    {
+        $products = self::get_products_by_category($category_id);
+        $unique_categories = array();
+
+        foreach ($products as $product) {
+            $subscribe_category = get_post_meta($product->ID, 'category_product', true);
+            if (!empty($subscribe_category) && !in_array($subscribe_category, $unique_categories)) {
+                $unique_categories[] = intval($subscribe_category);
+            }
+        }
+
+        return $unique_categories;
+    }
+
+    /**
      * Retrieves the highest subscription_product_id from products in a given category, including variations.
      *
      * @param int $category_id ID of the product category.

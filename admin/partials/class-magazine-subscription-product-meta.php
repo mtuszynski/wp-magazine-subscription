@@ -22,7 +22,9 @@ class Magazine_Subscription_Product_Meta
     {
         add_action('woocommerce_product_options_general_product_data', array($this, 'magazine_subscribe_product_meta'));
         add_action('woocommerce_process_product_meta', array($this, 'save_magazine_subscribe_product_meta'));
+        add_action('add_meta_boxes', array($this, 'add_send_subscription_checkbox'));
     }
+
     /**
      * Displays custom subscription meta fields in the product edit page.
      *
@@ -119,7 +121,7 @@ class Magazine_Subscription_Product_Meta
                 </div>
             </div>
 <?php
-        } else {
+        } else if() {
             woocommerce_wp_text_input(
                 array(
                     'id'                => 'subscription_product_id',
@@ -164,5 +166,48 @@ class Magazine_Subscription_Product_Meta
             $subscription_product_id = intval($_POST['subscription_product_id']);
             update_post_meta($post_id, 'subscription_product_id', $subscription_product_id);
         }
+    }
+
+    /**
+     * Adds a "Send Subscriptions" checkbox to the product edit page.
+     * The checkbox is displayed only if the product belongs to a subscription category.
+     */
+    public function add_send_subscription_checkbox()
+    {
+        global $post;
+        $selected_category_id = Magazine_Subscription_Helpers::get_subscribe_category_id();
+        $products_from_cat = Magazine_Subscription_Helpers::get_category_products_meta($selected_category_id);
+
+        $is_in_subscribed_category = false;
+        foreach ($products_from_cat as $category_id) {
+            if (Magazine_Subscription_Helpers::products_in_subscribed_category($post->ID, $category_id)) {
+                $is_in_subscribed_category = true;
+                break;
+            }
+        }
+
+        if ($is_in_subscribed_category) {
+            add_meta_box(
+                'send_subscription_meta_box',
+                __('Send Subscriptions', 'magazine-subscription'),
+                array($this, 'display_send_subscription_checkbox'),
+                'product',
+                'side',
+                'default'
+            );
+        }
+    }
+
+    /**
+     * Displays the "Send Subscriptions" checkbox in the product edit page sidebar.
+     * 
+     * @param WP_Post $post The current post object (product).
+     */
+    function display_send_subscription_checkbox($post)
+    {
+        echo '<label for="send_subscriptions">';
+        echo '<input type="checkbox" id="send_subscriptions" name="send_subscriptions" value="1" />';
+        echo __('Send Subscriptions Now', 'magazine-subscription');
+        echo '</label>';
     }
 }
