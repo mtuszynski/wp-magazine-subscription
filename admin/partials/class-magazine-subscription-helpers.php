@@ -108,6 +108,29 @@ class Magazine_Subscription_Helpers
     }
 
     /**
+     * Checks if a product is in any of the given subscribed categories.
+     *
+     * @param int   $product_id           The ID of the product.
+     * @param array $category_ids         An array of category IDs to check against.
+     *
+     * @return bool  True if the product is in at least one of the given categories, false otherwise.
+     */
+    public static function is_product_in_subscribed_categories($product_id, $category_ids)
+    {
+        if (empty($category_ids)) {
+            return false;
+        }
+
+        foreach ($category_ids as $category_id) {
+            if (self::products_in_subscribed_category($product_id, $category_id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Retrieves the highest subscription_product_id from products in a given category, including variations.
      *
      * @param int $category_id ID of the product category.

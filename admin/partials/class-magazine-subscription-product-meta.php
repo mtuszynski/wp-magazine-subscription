@@ -44,13 +44,7 @@ class Magazine_Subscription_Product_Meta
         $selected_category_id = Magazine_Subscription_Helpers::get_subscribe_category_id();
         $products_from_cat = Magazine_Subscription_Helpers::get_category_products_meta($selected_category_id);
 
-        $is_in_subscribed_category = false;
-        foreach ($products_from_cat as $category_id) {
-            if (Magazine_Subscription_Helpers::products_in_subscribed_category($product_id, $category_id)) {
-                $is_in_subscribed_category = true;
-                break;
-            }
-        }
+        $is_in_subscribed_category = Magazine_Subscription_Helpers::is_product_in_subscribed_categories($product_id, $products_from_cat);
 
         if (Magazine_Subscription_Helpers::products_in_subscribed_category($product_id, $selected_category_id)) { ?>
             <div class="options_group">
@@ -187,13 +181,7 @@ class Magazine_Subscription_Product_Meta
         $selected_category_id = Magazine_Subscription_Helpers::get_subscribe_category_id();
         $products_from_cat = Magazine_Subscription_Helpers::get_category_products_meta($selected_category_id);
 
-        $is_in_subscribed_category = false;
-        foreach ($products_from_cat as $category_id) {
-            if (Magazine_Subscription_Helpers::products_in_subscribed_category($post->ID, $category_id)) {
-                $is_in_subscribed_category = true;
-                break;
-            }
-        }
+        $is_in_subscribed_category = Magazine_Subscription_Helpers::is_product_in_subscribed_categories($post->ID, $products_from_cat);
 
         if ($is_in_subscribed_category) {
             add_meta_box(
