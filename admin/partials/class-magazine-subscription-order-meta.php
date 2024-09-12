@@ -131,9 +131,10 @@ class Magazine_Subscription_Order_Meta
             'user_email'          => sanitize_email($user_info->user_email),
             'order_id'            => intval($order_id),
             'product_name'        => '',
-            'subscription_length' => sanitize_text_field($subscription_length),
-            'subscription_start'  => sanitize_text_field($subscription_start),
-            'subscription_end'    => sanitize_text_field($subscription_end),
+            'category_subscription_id' => $subscribe_category,
+            'subscription_length' => intval($subscription_length),
+            'subscription_start'  => intval($subscription_start),
+            'subscription_end'    => intval($subscription_end),
             'attribute_selector'  => sanitize_text_field($attribute_selector),
             'subscribe_left'      => intval($subscribe_left)
         );

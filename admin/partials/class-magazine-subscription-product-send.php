@@ -45,7 +45,32 @@ class Magazine_Subscription_Product_Send
         }
 
         if (isset($_POST['send_subscriptions']) && $_POST['send_subscriptions'] == '1') {
-            // Checkbox is checked - execute necessary actions
+            $subscription_product_id = get_post_meta($post_id, 'subscription_product_id', true);
+            $product_category = wp_get_post_terms($post_id, 'product_cat', array('fields' => 'ids'));
+            $this->send_to_active_subscribers($post_id, $product_category, $subscription_product_id);
+        }
+    }
+    private function send_to_active_subscribers($post_id, $product_category, $subscription_product_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'magazine_subscribe_users';
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "
+        SELECT *
+        FROM {$table_name}
+        WHERE category_subscription_id = %d
+        AND %d >= subscription_start
+        AND %d <= subscription_end
+        ",
+                $product_category,
+                $subscription_product_id,
+                $subscription_product_id
+            )
+        );
+        if (!empty($results)) {
+            foreach ($results as $subscriber) {
+            }
         }
     }
 }

@@ -56,11 +56,14 @@ class Magazine_Subscription_Order_Complete
                 'user_email'          => sanitize_email($user_info->user_email),
                 'order_id'            => intval($order_id),
                 'product_name'        => sanitize_text_field(wc_get_product($subscription_product['product_id'])->get_name()),
-                'subscription_length' => $subscription_length,
-                'subscription_start'  => $subscription_start,
-                'subscription_end'    => $subscription_end,
-                'attribute_selector'  => $attribute_selector,
-                'subscribe_left'      => $subscribe_left
+                'category_subscription_id' => $subscribe_category,
+                'subscription_length' => intval($subscription_length),
+                'subscription_start'  => intval($subscription_start),
+                'subscription_end'    => intval($subscription_end),
+                'attribute_selector'  => sanitize_text_field(
+                    $attribute_selector
+                ),
+                'subscribe_left'      => intval($subscribe_left)
             );
 
             $existing_entry = $wpdb->get_row($wpdb->prepare(

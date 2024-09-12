@@ -46,6 +46,7 @@ class Magazine_Subscription_Activator
             user_email varchar(100) NOT NULL,
             order_id mediumint(9) NOT NULL UNIQUE,
             product_name varchar(255) NOT NULL,
+			category_subscription_id int(11) NOT NULL,
 			subscription_length int(11) NOT NULL,
             subscription_start int(11) NOT NULL,
             subscription_end int(11) NOT NULL,
