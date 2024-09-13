@@ -196,8 +196,6 @@ class Magazine_Subscription_Menu
         global $wpdb;
 
         $table_name = $wpdb->prefix . 'magazine_subscribe_users';
-
-        // Prepare and execute the SQL query to fetch active subscriptions
         $query = $wpdb->prepare(
             "SELECT * FROM $table_name WHERE subscribe_left > %d",
             0

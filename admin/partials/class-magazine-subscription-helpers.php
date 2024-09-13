@@ -258,70 +258,48 @@ class Magazine_Subscription_Helpers
      */
     public static function add_product_to_order($order_id, $product_id, $attribute_name, $attribute_value)
     {
-        error_log($order_id . ' ' . $product_id . ' ' . $attribute_name . ' ' . $attribute_value);
-
-        // Get order and product objects
         $order = wc_get_order($order_id);
         $product = wc_get_product($product_id);
 
         if (!$order || !$product) {
-            error_log('Order or product not found');
             return;
         }
 
-        // Handle variable products
         if ($product->is_type('variable')) {
-            // Use the helper function to get the variation ID
             $variation_id = self::get_product_variation_id($product_id, $attribute_name, $attribute_value);
             if (!$variation_id) {
-                error_log('No variation found');
                 return;
             }
 
-            // Check if the product variation is already in the order
             foreach ($order->get_items() as $item) {
                 if ($item->get_variation_id() == $variation_id) {
-                    error_log('Product variation already in order');
                     return;
                 }
             }
 
-            // Add the variation to the order
             $variation_product = wc_get_product($variation_id);
-            $variation_product->set_price(0); // Set price to 0
+            $variation_product->set_price(0);
             $order->add_product($variation_product, 1);
-            error_log('Product variation added to order');
-
-            // Recalculate order totals and update status
             $order->calculate_totals();
             $order->save();
             $order->update_status('completed');
 
-            // Grant download permissions if applicable
             $downloads = $variation_product->get_downloads();
             foreach ($downloads as $download_id => $download) {
                 wc_downloadable_file_permission($download_id, $variation_product->get_id(), $order);
             }
         } else {
-            // Handle simple products
             foreach ($order->get_items() as $item) {
                 if ($item->get_product_id() == $product_id) {
-                    error_log('Simple product already in order');
                     return;
                 }
             }
 
-            // Set price to 0 and add simple product to the order
             $product->set_price(0);
             $order->add_product($product, 1);
-            error_log('Simple product added to order');
-
-            // Recalculate order totals and update status
             $order->calculate_totals();
             $order->save();
             $order->update_status('completed');
-
-            // Grant download permissions if applicable
             $downloads = $product->get_downloads();
             foreach ($downloads as $download_id => $download) {
                 wc_downloadable_file_permission($download_id, $product->get_id(), $order);
